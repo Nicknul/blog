@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const qs = require('node:querystring');
 const { connect } = require('http2');
+const { stringify } = require('querystring');
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
@@ -48,13 +49,13 @@ const server = http.createServer((req, res) => {
         };
 
         const jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFile(path.join(__dirname, './public/blog.js'), jsonDataString, (err) => {
+        fs.writeFile(path.join(__dirname, './public/data.json'), jsonDataString, (err) => {
           if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('서버 자체 오류');
             return;
           }
-          res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           let jsonDataView = JSON.stringify(jsonData, null, 2);
           res.end(jsonDataView);
         });
