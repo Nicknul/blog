@@ -48,13 +48,13 @@ const server = http.createServer((req, res) => {
         };
 
         const jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFile(path.join(__dirname, './public/data.json'), jsonDataString, (err) => {
+        fs.writeFile(path.join(__dirname, './public/blog.js'), jsonDataString, (err) => {
           if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('서버 자체 오류');
             return;
           }
-          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
           let jsonDataView = JSON.stringify(jsonData, null, 2);
           res.end(jsonDataView);
         });
