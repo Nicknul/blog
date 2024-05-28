@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const qs = require('node:querystring');
 const { connect } = require('http2');
-const { stringify } = require('querystring');
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
@@ -18,14 +17,25 @@ const server = http.createServer((req, res) => {
         res.end(data);
       });
     }
-    if (req.url === '/blog.js') {
-      fs.readFile(path.join(__dirname, './public/blog.js'), (err, data) => {
+    if (req.url === '/submit/public/data.json') {
+      fs.readFile(path.join(__dirname, './public/data.json'), (err, data) => {
         if (err) {
           res.writeHead(500, { 'Content-Type': 'text/plain' });
           res.end('서버 자체 오류');
           return;
         }
-        res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+        res.writeHead(200, { 'Content-Type': 'aplication/json' });
+        res.end(data);
+      });
+    }
+    if (req.url === '/test.js') {
+      fs.readFile(path.join(__dirname, './public/test.js'), (err, data) => {
+        if (err) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('서버 자체 오류');
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'aplication/js' });
         res.end(data);
       });
     }
