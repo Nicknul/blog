@@ -1,13 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const qs = require('node:querystring');
-const path = require('path');
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
     console.log('유효성 검사: ', req.url);
     if (req.url === '/') {
-      const data = fs.readFileSync('./string.html');
+      const data = fs.readFileSync('./blog.html');
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=stf-8' });
       res.write(data);
@@ -28,10 +27,28 @@ const server = http.createServer((req, res) => {
         let title = data.title;
         let content = data.content;
         // console.log(title, content);
-      });
 
-      fs.writeFile();
+        let today = require('./date.js');
+
+        fs.writeFile(`./data/${today}.html`, content, 'utf-8', (err) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('서버 자체 오류');
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end();
+        });
+      });
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end();
+      return;
     }
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end();
+    return;
   }
 });
 
