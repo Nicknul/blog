@@ -1,5 +1,8 @@
 const http = require('http');
 const fs = require('fs');
+const qs = require('node:querystring');
+let a = fs.readFileSync('./hello.html', 'utf-8');
+console.log(a);
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
@@ -28,6 +31,24 @@ const server = http.createServer((req, res) => {
     }
   } else if (req.method === 'POST') {
     if (req.url === '/submit') {
+      let body = '';
+      req.on('data', (data) => {
+        body += data.toString();
+      });
+      req.on('end', () => {
+        let data = qs.parse(body);
+        let title = data.title;
+        let content = data.content;
+
+        fs.writeFile(`${title}.html`, content, 'utf-8', (err) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('서버 자체 오류');
+          }
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end(a);
+        });
+      });
     }
   }
 });
