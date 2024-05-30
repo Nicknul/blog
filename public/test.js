@@ -6,3 +6,5 @@
 //   return b;
 // }
 // jsonData();
+
+console.log('잘 불러와짐');
