@@ -1,8 +1,6 @@
 const http = require('http');
 const fs = require('fs');
 const qs = require('node:querystring');
-let a = fs.readFileSync('./hello.html', 'utf-8');
-console.log(a);
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
@@ -40,13 +38,23 @@ const server = http.createServer((req, res) => {
         let title = data.title;
         let content = data.content;
 
-        fs.writeFile(`${title}.html`, content, 'utf-8', (err) => {
+        let totalNow = require('./date.js');
+        let a = fs.readFileSync('./public/blog.html', 'utf-8');
+        let b = `</form>
+            <div id="root">
+              <a href="/h1.html">${title} ${totalNow}</a>
+            </div>
+        `;
+        let c = a.replace('</form>', b);
+        console.log(c);
+
+        fs.writeFile(`${title}.html`, c, 'utf-8', (err) => {
           if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('서버 자체 오류');
           }
           res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          res.end(a);
+          res.end(c);
         });
       });
     }
