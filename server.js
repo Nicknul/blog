@@ -20,6 +20,7 @@ const blogStr = `<!DOCTYPE html>
     </form>
     <div id="root">
       <h1>Menu</h1>
+      <div></div>
     </div>
   </body>
 </html>
@@ -30,44 +31,47 @@ const dataStr = `<!DOCTYPE html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>title</title>
+    <title>name</title>
         </head>
         <body>
           <div id="root">
-            <h1>title</h1>
+            <h1>name</h1>
             <div>content</div>
-            <a href="/blog.html">돌아가기</a>
+            <a href="/">돌아가기</a>
           </div>
         </body>
       </html>`;
 
 //* readdir
 let list = '';
+let link = '';
 
 fs.readdir('./data', (err, fileList) => {
+  link = fileList;
+  // list = fileList;
   for (let i = 0; i < fileList.length; i++) {
-    list += `<div><a href="/data/${fileList[i]}">${fileList[i]}</a></div>`;
+    list += `<li><a href="/data/${fileList[i]}">${fileList[i]}</a></li>`;
   }
 });
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
-    console.log('유효성 검사: ', req.url);
+    console.log('유효성 검사:', req.url);
     if (req.url === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(blog);
-    }
-    if (req.url === '/blog.html') {
-      const data = fs.readFileSync('./blog.html', 'utf-8');
+      let add = blogStr.replace('<div></div>', `${list}`);
+      fs.writeFileSync('./blog.html', add, 'utf-8');
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(data);
+      res.end(add);
     }
-    if (req.url === `/data/${today}.html`) {
-      const frist = fs.readFileSync(`./data/${today}.html`, 'utf-8');
+    for (let element in link) {
+      // console.log(link[element]);
+      if (req.url === `/data/${link[element]}`) {
+        let a = fs.readFileSync(`./data/${link[element]}`);
 
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(frist);
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(a);
+      }
     }
     //* POST 요청일 때
   } else if (req.method === 'POST') {
@@ -76,7 +80,6 @@ const server = http.createServer((req, res) => {
 
       req.on('data', (data) => {
         body += data.toString();
-        // console.log(body);
       });
 
       req.on('end', () => {
@@ -84,18 +87,16 @@ const server = http.createServer((req, res) => {
         let title = data.title;
         let content = data.content;
 
-        fs.writeFile('./blog.html', blogFileStr, 'utf-8', () => {
-          let addTitle = `${title}`;
-          let totalTitle = dataStr.replace('title', addTitle);
-          let addContent = `${content}`;
-          let totalContent = totalTitle.replace('content', addContent);
+        let a = dataStr.replace('<title>name</title>', `<title>${title}</title>`);
+        let b = a.replace('<h1>name</h1>', `<h1>${title}</h1>`);
+        let c = b.replace('<div>content</div>', `<div>${content}</div>`);
 
-          fs.writeFile(`./data/${today}.html`, totalContent, 'utf-8', () => {
-            fs.readFileSync(`./data/${today}.html`, 'utf-8');
+        fs.writeFile(`./data/${today}.html`, c, 'utf-8', () => {
+          let add = blogStr.replace('<div></div>', `${list}`);
+          fs.readFileSync(`./data/${today}.html`, 'utf-8');
 
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(blog);
-          });
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end(add);
         });
 
         // //* blog.html menu
