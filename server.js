@@ -48,6 +48,7 @@ let link = '';
 
 fs.readdir('./data', (err, fileList) => {
   link = fileList;
+  console.log(link);
   // list = fileList;
   for (let i = 0; i < fileList.length; i++) {
     list += `<li><a href="/data/${fileList[i]}">${fileList[i]}</a></li>`;
@@ -59,18 +60,18 @@ const server = http.createServer((req, res) => {
     console.log('유효성 검사:', req.url);
     if (req.url === '/') {
       let add = blogStr.replace('<div></div>', `${list}`);
-      fs.writeFileSync('./blog.html', add, 'utf-8');
-
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(add);
+      fs.writeFile('./blog.html', add, 'utf-8', (err) => {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(add);
+      });
     }
     for (let element in link) {
       // console.log(link[element]);
       if (req.url === `/data/${link[element]}`) {
-        let a = fs.readFileSync(`./data/${link[element]}`);
-
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(a);
+        fs.readFile(`./data/${link[element]}`, (err, data) => {
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end(data);
+        });
       }
     }
     //* POST 요청일 때
@@ -91,13 +92,40 @@ const server = http.createServer((req, res) => {
         let b = a.replace('<h1>name</h1>', `<h1>${title}</h1>`);
         let c = b.replace('<div>content</div>', `<div>${content}</div>`);
 
-        fs.writeFile(`./data/${today}.html`, c, 'utf-8', () => {
-          let add = blogStr.replace('<div></div>', `${list}`);
-          fs.readFileSync(`./data/${today}.html`, 'utf-8');
+        let add = blogStr.replace('<div></div>', `${list}`);
 
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          res.end(add);
+        let e = [];
+        fs.readdir('./data', 'utf-8', (err, fileList) => {
+          e += fileList;
+          console.log(e);
         });
+
+        fs.writeFile(`./data/${today}.html`, c, 'utf-8', (err) => {
+          if (err) {
+            console.log(err);
+          }
+          fs.writeFile('./blog.html', add, 'utf-8', (err) => {
+            if (err) {
+              console.log(err);
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+            res.end(add);
+          });
+          // fs.readFile('./blog.html', (err, data) => {
+          //   if (err) {
+          //     console.log(err);
+          //   }
+          //   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          //   res.end(data);
+          // });
+          // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          // res.end();
+        });
+        // fs.writeFile('./blog.html', add, 'utf-8', () => {
+        //   fs.writeFileSync(`./data/${today}.html`, c, 'utf-8');
+        //   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        //   res.end(add);
+        // });
 
         // //* blog.html menu
         // let blogFileStr = `<!DOCTYPE html>
