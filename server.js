@@ -46,14 +46,11 @@ const dataStr = `<!DOCTYPE html>
 let list = '';
 let link = '';
 
-fs.readdir('./data', (err, fileList) => {
-  link = fileList;
-  console.log(link);
-  // list = fileList;
-  for (let i = 0; i < fileList.length; i++) {
-    list += `<li><a href="/data/${fileList[i]}">${fileList[i]}</a></li>`;
-  }
-});
+// fs.readdir('./data', (err, fileList) => {
+//   for (let names in fileList) {
+//     console.log(fileList[names]);
+//   }
+// });
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
@@ -94,16 +91,21 @@ const server = http.createServer((req, res) => {
 
         let add = blogStr.replace('<div></div>', `${list}`);
 
-        let e = [];
-        fs.readdir('./data', 'utf-8', (err, fileList) => {
-          e += fileList;
-          console.log(e);
-        });
+        // let e = [];
+        // fs.readdir('./data', 'utf-8', (err, fileList) => {
+        //   e += fileList;
+        //   console.log(e);
+        // });
 
         fs.writeFile(`./data/${today}.html`, c, 'utf-8', (err) => {
           if (err) {
             console.log(err);
           }
+          fs.readdir('./data', (err, fileList) => {
+            for (let element in fileList) {
+              console.log(fileList[element]);
+            }
+          });
           fs.writeFile('./blog.html', add, 'utf-8', (err) => {
             if (err) {
               console.log(err);
