@@ -43,19 +43,16 @@ const dataStr = `<!DOCTYPE html>
 
 let list = '';
 let link = '';
-
 fs.readdir('./data', 'utf-8', (err, fileList) => {
-  // console.log(fileList);
   for (let element in fileList) {
     list += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
-    // console.log(list);
   }
   link = fileList;
-  // console.log(link);
+  console.log(link);
 });
 const server = http.createServer((req, res) => {
+  console.log('유효성 검사:', req.url);
   if (req.method === 'GET') {
-    console.log('유효성 검사:', req.url);
     if (req.url === '/') {
       let a = blogStr.replace('<div></div>', list);
       fs.writeFileSync('./blog.html', a, 'utf-8');
@@ -65,10 +62,9 @@ const server = http.createServer((req, res) => {
     }
     for (let element in link) {
       if (req.url === `/data/${link[element]}`) {
-        fs.readFile(`./data/${link[element]}`, 'utf-8', (err, data) => {
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          res.end(data);
-        });
+        let a = fs.readFileSync(`./data/${link[element]}`, 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(a);
       }
     }
   } else if (req.method === 'POST') {
@@ -92,6 +88,7 @@ const server = http.createServer((req, res) => {
         let c = b.replace('<div>content</div>', `<div>${content}</div>`);
 
         fs.writeFileSync(`./data/${title}.html`, c, 'utf-8');
+        fs.readFileSync(`./data/${title}.html`, 'utf-8');
 
         let d = '';
         let e = '';
@@ -100,7 +97,9 @@ const server = http.createServer((req, res) => {
           for (let element in fileList) {
             d += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
           }
+
           let add = blogStr.replace('<div></div>', d);
+
           fs.writeFileSync('./blog.html', add, 'utf-8');
 
           res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
