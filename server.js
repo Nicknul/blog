@@ -87,23 +87,25 @@ const server = http.createServer((req, res) => {
         let b = a.replace('<h1>name</h1>', `<h1>${title}</h1>`);
         let c = b.replace('<div>content</div>', `<div>${content}</div>`);
 
-        fs.writeFileSync(`./data/${title}.html`, c, 'utf-8');
-        fs.readFileSync(`./data/${title}.html`, 'utf-8');
+        fs.writeFile(`./data/${title}.html`, c, 'utf-8', () => {
+          let d = '';
+          fs.readdir('./data', 'utf-8', (err, fileList) => {
+            for (let element in fileList) {
+              d += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
+            }
+            let add = blogStr.replace('<div></div>', d);
+            fs.writeFile('./blog.html', add, 'utf-8', () => {
+              // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+              // res.end(add);
+              fs.readFile(`./data/${title}.html`, 'utf-8', (err, data) => {
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end(data);
+              });
+            });
+          });
 
-        let d = '';
-        let e = '';
-        fs.readdir('./data', 'utf-8', (err, fileList) => {
-          e = fileList;
-          for (let element in fileList) {
-            d += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
-          }
-
-          let add = blogStr.replace('<div></div>', d);
-
-          fs.writeFileSync('./blog.html', add, 'utf-8');
-
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          res.end(add);
+          // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          // res.end(add)
         });
       });
     }
