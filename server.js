@@ -48,7 +48,7 @@ fs.readdir('./data', 'utf-8', (err, fileList) => {
     list += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
   }
   link = fileList;
-  console.log(link);
+  // console.log(link);
 });
 const server = http.createServer((req, res) => {
   console.log('유효성 검사:', req.url);
@@ -87,27 +87,45 @@ const server = http.createServer((req, res) => {
         let b = a.replace('<h1>name</h1>', `<h1>${title}</h1>`);
         let c = b.replace('<div>content</div>', `<div>${content}</div>`);
 
-        fs.writeFile(`./data/${title}.html`, c, 'utf-8', () => {
-          let d = '';
-          fs.readdir('./data', 'utf-8', (err, fileList) => {
-            for (let element in fileList) {
-              d += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
-            }
-            let add = blogStr.replace('<div></div>', d);
-            fs.writeFile('./blog.html', add, 'utf-8', () => {
-              // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-              // res.end(add);
-              fs.readFile(`./data/${title}.html`, 'utf-8', (err, data) => {
-                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                res.end(data);
-              });
-            });
-          });
+        fs.writeFileSync(`./data/${title}.html`, c, 'utf-8');
+        let d = '';
+        let e = '';
+        fs.readdir('./data', 'utf-8', (err, fileList) => {
+          for (let element in fileList) {
+            d += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
+          }
 
-          // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          // res.end(add)
+          let add = blogStr.replace('<div></div>', d);
+
+          fs.writeFileSync('./blog.html', add, 'utf-8');
+
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end(add);
         });
+
+        // fs.writeFile(`./data/${title}.html`, c, 'utf-8', () => {
+        //   let d = '';
+        //   fs.readdir('./data', 'utf-8', (err, fileList) => {
+        //     for (let element in fileList) {
+        //       d += `<li><a href="/data/${fileList[element]}">${fileList[element]}</a></li>`;
+        //     }
+        //     let add = blogStr.replace('<div></div>', d);
+        //     fs.writeFile('./blog.html', add, 'utf-8', () => {
+        // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        // res.end(add);
+        //       fs.readFile(`./data/${title}.html`, 'utf-8', (err, data) => {
+        //         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        //         res.end(data);
+        //       });
+        //     });
+        //   });
+
+        // res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        // res.end(add)
+        // });
       });
+
+      req.on('');
     }
   }
 });
